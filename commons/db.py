@@ -37,6 +37,7 @@ class SqliteClient():
                 # else table creation will ignored
                 query = "CREATE TABLE IF NOT EXISTS user_data(\
                     id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,\
+                    name CHAR(100),\
                     mobile_number CHAR(100),\
                     password CHAVARR(100),\
                     dob CHAR(100) NULL,\
