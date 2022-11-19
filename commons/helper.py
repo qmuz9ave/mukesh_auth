@@ -124,7 +124,7 @@ class AuthHelper():
             print("======Login Successful======\n")
             print(f"WELCOME {user.instance.get('name')}")
             print("\nChoose the following options\n")
-            choice = input("\nChange Password: 1\nLog Out: 2\n")
+            choice = input("\nChange Password: 1\nOrdering: 2\nLog Out: 3\n")
 
             if choice == "1":
                 print("\n....change password form....\nPlease Enter Your New Password")
@@ -142,11 +142,63 @@ class AuthHelper():
 
                 user.objects().update(password=password)
                 print("\n....Password Changed Successfully....\n")
-                return True  
+                return True
             elif choice == "2":
+                self.ordering(user=user)  
+            elif choice == "3":
                 pass
 
         else:
             print("User Not Found")
             return False
        
+    def ordering(self,user):
+        os.system('cls')
+        print("\n....Ordering form....\nPlease Enter Your Choice")
+        print("\nEnter 1 to start ordering\n")
+        print("\nEnter 2 to to print statistic\n")
+        print("\nEnter 3 to to LogOut\n")
+        choice = ("Please select an option")
+
+        if choice == "1":
+            os.system('cls')
+            print("\nEnter 1 for Dine in\n")
+            print("\nEnter 2 for Order Online\n")
+            print("\nEnter 3 for L ogin Page\n")
+
+            choice = input("Enter your choice: ")
+            if choice == "1":
+                menu_choice = self.get_menu_choice()
+                #todo
+            elif choice == "2":
+                pass
+            elif choice == "3":
+                return False
+            else: return False
+
+        elif choice == "2":
+            pass
+        elif choice == "3":
+            return False
+
+    def get_menu_choice(self):
+
+        print("\nEnter 1 for Noodles    Price AUD 2\n")
+        print("\nEnter 2 for Sandwitch  Price AUD 4\n")
+        print("\nEnter 3 for Dumpling   Price AUD 6\n")
+        print("\nEnter 4 for Muffins    Price AUD 8\n")
+        choice = input("Place Your Order")
+        if choice == "1":
+            choice =  "Noodles"
+        elif choice == "2":
+           choice = "Sandwich"
+        elif choice == "3":
+            choice = "Dumpling"
+        elif choice == "4":
+           choice = "Muffins"
+        
+        cnfrm = input("Please Enter Y to proceed to checkout or N to cancel")
+        if cnfrm == "Y" or cnfrm == "y":
+            return choice
+        else:
+            return False
