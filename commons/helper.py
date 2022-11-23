@@ -1,7 +1,10 @@
 import os
 from getpass import getpass
-from commons.db import UserData
+from commons.db import UserData,OrderData
 from datetime import datetime
+import time
+import pandas as pd
+
 class AuthHelper():
     def __init__(self) -> None:
         self.error_count = 0
@@ -73,6 +76,7 @@ class AuthHelper():
         print("======SIGN UP======\n")
         #name
         full_name = input("Enter Your Name: ")
+        address = input("Enter Your Address: ")
         #dob
         dob = input("Enter Your DOB [yy-mm-dd]: ")
         valid_dob = self.validate_dob(dob)
@@ -102,6 +106,7 @@ class AuthHelper():
             name=full_name,
             mobile_number=mobile_number,
             dob=dob,
+            address=address,
             password=password
         )
 
@@ -144,7 +149,7 @@ class AuthHelper():
                 print("\n....Password Changed Successfully....\n")
                 return True
             elif choice == "2":
-                self.ordering(user=user)  
+                self.ordering(user=user.instance)  
             elif choice == "3":
                 pass
 
@@ -153,51 +158,87 @@ class AuthHelper():
             return False
        
     def ordering(self,user):
-        os.system('cls')
         print("\n....Ordering form....\nPlease Enter Your Choice")
-        print("\nEnter 1 to start ordering\n")
-        print("\nEnter 2 to to print statistic\n")
+        print("\nEnter 1 to start ordering")
+        print("\nEnter 2 to to print statistic")
         print("\nEnter 3 to to LogOut\n")
-        choice = ("Please select an option")
+        choice = input("Please select an option: ")
 
         if choice == "1":
             os.system('cls')
-            print("\nEnter 1 for Dine in\n")
-            print("\nEnter 2 for Order Online\n")
-            print("\nEnter 3 for L ogin Page\n")
-
-            choice = input("Enter your choice: ")
+            choice = input("\nEnter 1 for Dine in\nEnter 2 for Order Online\nEnter 3 for Login Page\nEnter Your Choice: ")
             if choice == "1":
-                menu_choice = self.get_menu_choice()
-                #todo
+                menu_choice,price = self.get_menu_choice()
+                print(menu_choice)
+                
+                order_data = OrderData()
+                order_data.objects().create(
+                    name = menu_choice,
+                    user_id = user.get("id"),
+                    type = choice,
+                    price = price
+                )
+                print("\n....Your Order has been placed successfully....\n wait for a whie")
+                print("-------------------------------------------------------------------\n")
+                print(f"Your Total Paybale is {price} AUD including 7.5 for service charge")
+                print("-------------------------------------------------------------------\n")
+                time.sleep(3)
+                return self.ordering(user=user)
+                
             elif choice == "2":
-                pass
+                os.system('cls')
+                delivery_choice = input("\nEnter 1 for Self Pickup\nEnter 2 for Home Delivery\nEnter 3 for Previous Menu\nEnter Your Choice: ")
+                if delivery_choice == "1":
+                    delivery_option ="Self PickUP"
+                elif delivery_choice == "2":
+                    delivery_option =" Home Delivery"
+                elif delivery_choice == "3":
+                    self.ordering(user=user)
+                menu_choice,price = self.get_menu_choice()
+                order_data = OrderData()
+                order_data.objects().create(
+                    name = menu_choice,
+                    user_id = user.get("id"),
+                    type = choice,
+                    price = price,
+                    delivery = delivery_option
+                )
+                print("\n....Your Order has been placed successfully....\n wait for a whie")
+                print("-------------------------------------------------------------------\n")
+                print(f"Your Total Paybale is {price} AUD")
+                print("-------------------------------------------------------------------\n")
+                time.sleep(3)
+                return self.ordering(user=user)
             elif choice == "3":
                 return False
             else: return False
 
         elif choice == "2":
-            pass
+            order_data = OrderData()
+            user_orders = order_data.objects().filter(user_id=user.get("id"))
+            data_frames = pd.DataFrame.from_records(user_orders)
+            print(data_frames)
+            return self.ordering(user=user)
         elif choice == "3":
             return False
 
     def get_menu_choice(self):
-
+        os.system('cls')
         print("\nEnter 1 for Noodles    Price AUD 2\n")
         print("\nEnter 2 for Sandwitch  Price AUD 4\n")
         print("\nEnter 3 for Dumpling   Price AUD 6\n")
         print("\nEnter 4 for Muffins    Price AUD 8\n")
-        choice = input("Place Your Order")
+        print("\nEnter 5 for Checkout\n")
+        choice = input("Place Your Order: ")
         if choice == "1":
-            choice =  "Noodles"
+            choice =  "Noodles",2
         elif choice == "2":
-           choice = "Sandwich"
+           choice = "Sandwich",4
         elif choice == "3":
-            choice = "Dumpling"
+            choice = "Dumpling",6
         elif choice == "4":
-           choice = "Muffins"
-        
-        cnfrm = input("Please Enter Y to proceed to checkout or N to cancel")
+           choice = "Muffins",8
+        cnfrm = input("Please Enter Y to proceed to checkout or N to cancel: ")
         if cnfrm == "Y" or cnfrm == "y":
             return choice
         else:
