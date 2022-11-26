@@ -70,8 +70,14 @@ class SqliteClient():
                     name CHAR(100),\
                     user_id CHAR(100),\
                     type CHAR(100),\
-                    price CHARVAR(100),\
+                    price CHAR(100),\
                     delivery CHAR(100),\
+                    no_of_person CHAR(100),\
+                    date_of_visit CHAR(100),\
+                    time_of_visit CHAR(100),\
+                    date_of_pickup CHAR(100),\
+                    time_of_pickup CHAR(100),\
+                    name_of_person_picking_up CHAR(100),\
                     created_at CHAR(100) NULL,\
                     updated_at CHAR(100) NULL\
                         )"

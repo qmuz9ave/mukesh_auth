@@ -169,14 +169,19 @@ class AuthHelper():
             choice = input("\nEnter 1 for Dine in\nEnter 2 for Order Online\nEnter 3 for Login Page\nEnter Your Choice: ")
             if choice == "1":
                 menu_choice,price = self.get_menu_choice()
-                print(menu_choice)
+                number_of_person = input("Please Enter Number Of Person")
+                date_of_visit = input("Enter Date Of Visit")
+                time_of_visit = input("Enter Time Of Visit")
                 
                 order_data = OrderData()
                 order_data.objects().create(
                     name = menu_choice,
                     user_id = user.get("id"),
                     type = choice,
-                    price = price
+                    price = price,
+                    no_of_person=number_of_person,
+                    date_of_visit=date_of_visit,
+                    time_of_visit=time_of_visit
                 )
                 print("\n....Your Order has been placed successfully....\n wait for a whie")
                 print("-------------------------------------------------------------------\n")
@@ -188,8 +193,14 @@ class AuthHelper():
             elif choice == "2":
                 os.system('cls')
                 delivery_choice = input("\nEnter 1 for Self Pickup\nEnter 2 for Home Delivery\nEnter 3 for Previous Menu\nEnter Your Choice: ")
+                date_of_pickup=""
+                time_of_pickup=""
+                name_of_person_picking_up=""
                 if delivery_choice == "1":
                     delivery_option ="Self PickUP"
+                    date_of_pickup = input("Please Enter Date Of Pickup")
+                    time_of_pickup = input("Please Enter Time Of Pickup")
+                    name_of_person_picking_up = input("Please Enter Name Of Person Picking Up")
                 elif delivery_choice == "2":
                     delivery_option =" Home Delivery"
                 elif delivery_choice == "3":
@@ -201,7 +212,10 @@ class AuthHelper():
                     user_id = user.get("id"),
                     type = choice,
                     price = price,
-                    delivery = delivery_option
+                    delivery = delivery_option,
+                    date_of_pickup=date_of_pickup,
+                    time_of_pickup=time_of_pickup,
+                    name_of_person_picking_up=name_of_person_picking_up
                 )
                 print("\n....Your Order has been placed successfully....\n wait for a whie")
                 print("-------------------------------------------------------------------\n")
