@@ -78,6 +78,8 @@ class SqliteClient():
                     date_of_pickup CHAR(100),\
                     time_of_pickup CHAR(100),\
                     name_of_person_picking_up CHAR(100),\
+                    date_of_delivery CHAR(100),\
+                    time_of_delivery CHAR(100),\
                     created_at CHAR(100) NULL,\
                     updated_at CHAR(100) NULL\
                         )"
@@ -264,6 +266,16 @@ class OrderData(object):
                 data.append(data_dict)
         return data
 
+    def all(self):
+        query = f"SELECT * FROM {self.table_name}"
+        selector = self.cursor.execute(query)
+        result = selector.fetchall()
+        self.cursor.close()
+        data = self.decode_row_object(result)
+        # set id as none
+        self.id = None
+        return data
+        
     def get(self,**kwargs):
         query = f"SELECT * FROM {self.table_name} WHERE "
         counter = 1

@@ -158,7 +158,8 @@ class AuthHelper():
             return False
        
     def ordering(self,user):
-        print("\n....Ordering form....\nPlease Enter Your Choice")
+        os.system('cls')
+        print("\n=====ORDERING FORM======\nPlease Enter Your Choice")
         print("\nEnter 1 to start ordering")
         print("\nEnter 2 to to print statistic")
         print("\nEnter 3 to to LogOut\n")
@@ -169,9 +170,11 @@ class AuthHelper():
             choice = input("\nEnter 1 for Dine in\nEnter 2 for Order Online\nEnter 3 for Login Page\nEnter Your Choice: ")
             if choice == "1":
                 menu_choice,price = self.get_menu_choice()
-                number_of_person = input("Please Enter Number Of Person")
-                date_of_visit = input("Enter Date Of Visit")
-                time_of_visit = input("Enter Time Of Visit")
+                if not menu_choice:
+                    self.ordering(user=user)
+                number_of_person = input("Please Enter Number Of Person: ")
+                date_of_visit = input("Enter Date Of Visit[yy-mm-dd]: ")
+                time_of_visit = input("Enter Time Of Visit[h:m]: ")
                 
                 order_data = OrderData()
                 order_data.objects().create(
@@ -195,17 +198,25 @@ class AuthHelper():
                 delivery_choice = input("\nEnter 1 for Self Pickup\nEnter 2 for Home Delivery\nEnter 3 for Previous Menu\nEnter Your Choice: ")
                 date_of_pickup=""
                 time_of_pickup=""
+                date_of_delivery=""
+                time_of_delivery=""
                 name_of_person_picking_up=""
                 if delivery_choice == "1":
                     delivery_option ="Self PickUP"
-                    date_of_pickup = input("Please Enter Date Of Pickup")
-                    time_of_pickup = input("Please Enter Time Of Pickup")
-                    name_of_person_picking_up = input("Please Enter Name Of Person Picking Up")
+                    date_of_pickup = input("Please Enter Date Of Pickup[yy-mm-dd]: ")
+                    time_of_pickup = input("Please Enter Time Of Pickup[h:m]: ")
+                    name_of_person_picking_up = input("Please Enter Name Of Person Picking Up: ")
                 elif delivery_choice == "2":
-                    delivery_option =" Home Delivery"
+                    date_of_delivery=input("Please Enter Date Of Delivery[yy-mm-dd]: ")
+                    time_of_delivery=input("Please Enter Time Of Delivery[h:m]: ")
+                    delivery_option ="Home Delivery"
                 elif delivery_choice == "3":
                     self.ordering(user=user)
+                else:
+                    return False
                 menu_choice,price = self.get_menu_choice()
+                if not menu_choice:
+                    self.ordering(user=user)
                 order_data = OrderData()
                 order_data.objects().create(
                     name = menu_choice,
@@ -215,7 +226,9 @@ class AuthHelper():
                     delivery = delivery_option,
                     date_of_pickup=date_of_pickup,
                     time_of_pickup=time_of_pickup,
-                    name_of_person_picking_up=name_of_person_picking_up
+                    name_of_person_picking_up=name_of_person_picking_up,
+                    date_of_delivery=date_of_delivery,
+                    time_of_delivery=time_of_delivery,
                 )
                 print("\n....Your Order has been placed successfully....\n wait for a whie")
                 print("-------------------------------------------------------------------\n")
@@ -228,21 +241,55 @@ class AuthHelper():
             else: return False
 
         elif choice == "2":
+            statistic_choice = input("Please Enter Option to Print The Statistics.\n1.All Dine in Orders\n2.All Pick up Order\n3.All Deliveries\n4.All Orders\n5.Total Amount Spent on All Orders\n6.Go to Previous Menu\n : ")
             order_data = OrderData()
-            user_orders = order_data.objects().filter(user_id=user.get("id"))
-            data_frames = pd.DataFrame.from_records(user_orders)
+            if statistic_choice == "1":
+                user_orders = order_data.objects().filter(type="1")
+                data_frames = pd.DataFrame.from_records(user_orders)
+            elif statistic_choice =="2":
+                user_orders = order_data.objects().filter(delivery="Self PickUP")
+                data_frames = pd.DataFrame.from_records(user_orders)
+            elif statistic_choice =="3":
+                user_orders_pickup = order_data.objects().filter(delivery="Self PickUP")
+                user_orders_home = order_data.objects().filter(delivery="Home Delivery")
+                all = user_orders_pickup+user_orders_home
+                data_frames = pd.DataFrame.from_records(all)
+            elif statistic_choice =="4":
+                user_orders= order_data.objects().all()
+                data_frames = pd.DataFrame.from_records(user_orders)
+            elif statistic_choice =="5":
+                user_orders= order_data.objects().all()
+                total_price = 0
+                for order in user_orders:
+                    price = order.get("price")
+                    total_price = total_price +int(price)
+
+                print("=====================================================")
+                print(f"Total Price Spend is : {total_price} USD")
+                print("=====================================================")
+                return False
+            else:
+                return False
             print(data_frames)
+            time.sleep(5)
             return self.ordering(user=user)
         elif choice == "3":
             return False
 
     def get_menu_choice(self):
         os.system('cls')
-        print("\nEnter 1 for Noodles    Price AUD 2\n")
-        print("\nEnter 2 for Sandwitch  Price AUD 4\n")
-        print("\nEnter 3 for Dumpling   Price AUD 6\n")
-        print("\nEnter 4 for Muffins    Price AUD 8\n")
-        print("\nEnter 5 for Checkout\n")
+        print("===============MENU===================")
+        print('\n=====normal====')
+        print("\nEnter 1 for Noodles    Price AUD 2")
+        print("\nEnter 2 for Sandwitch  Price AUD 4")
+        print("\nEnter 3 for Dumpling   Price AUD 6")
+        print("\nEnter 4 for Muffins    Price AUD 8")
+        print("\nEnter 5 for Pasta      Price AUD 10")
+        print("\nEnter 6 for Pizza      Price AUD 20")
+        print('\n=====liquairs====')
+        print("\nEnter 7 for Coffee      Price AUD 2")
+        print("\nEnter 8 for Cold Drink  Price AUD 4")
+        print("\nEnter 9 for Shake       Price AUD 6\n")
         choice = input("Place Your Order: ")
         if choice == "1":
             choice =  "Noodles",2
@@ -252,8 +299,21 @@ class AuthHelper():
             choice = "Dumpling",6
         elif choice == "4":
            choice = "Muffins",8
+        elif choice == "5":
+            choice = "Pasta",10
+        elif choice == "6":
+            choice = "Pizza",20
+        elif choice == "7":
+            choice = "Coffee",2
+        elif choice == "8":
+            choice = "Cold Drink",4
+        elif choice == "9":
+            choice = "Shake",6
+        else:
+            return False,None
+
         cnfrm = input("Please Enter Y to proceed to checkout or N to cancel: ")
         if cnfrm == "Y" or cnfrm == "y":
             return choice
         else:
-            return False
+            return False,None
